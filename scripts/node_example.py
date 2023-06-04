@@ -63,7 +63,12 @@ class DroneController:
         
     def run(self):
         if (not self.__first and self._flag == None):
+            rospy.Timer(rospy.Duration(3), self.__shutdown)
             self.__generatePoints()
+
+    def __shutdown(self, event):
+        self._flag = False
+        rospy.signal_shutdown("Start trajectory")
 
     def getDronemsg(self):
         return self.__drone_msg
@@ -72,9 +77,6 @@ class DroneController:
 def stop():
     # Stop message
     print("Stopping")
-
-def shutdown():
-    rospy.signal_shutdown("Start trajectory")
 
 if __name__ == '__main__':
     rospy.init_node('node_example') 
@@ -94,8 +96,6 @@ if __name__ == '__main__':
             controller.run()
             if (controller._flag):
                 waypoint_publisher.publish(controller.getDronemsg())
-                rospy.Timer(rospy.Duration(3), shutdown)
 
         except rospy.ROSInterruptException:
             pass
-
